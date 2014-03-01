@@ -9,12 +9,12 @@ using namespace v8;
 Persistent<Function> Connection::constructor;
 
 Connection::Connection(char *hostname, int32_t port) : hostname_(hostname), port_(port) {
+  // TODO: lookup stupid string copying stuff for C++
   std::cout << "Riak connection to " << hostname << ":" << port << std::endl;
   riak_error err = riak_config_new_default(&cfg);
   std::cout << "Error code = " << err << std::endl;
-  std::cout << "Hostname =[" << hostname_ << "]" << std::endl;
-  // UM, passing in hostname_ to riak_connection_new returns ERIAK_DNS_RESOLUTION
-  err = riak_connection_new(cfg, &cxn, "localhost", "10017", NULL);
+  err = riak_connection_new(cfg, &cxn, strdup(hostname), "10017", NULL);
+
   std::cout << "Error code = " << err << std::endl;
   std::cout << "Connected to Riak" << std::endl;
 }
