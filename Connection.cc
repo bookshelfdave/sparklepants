@@ -68,36 +68,34 @@ Handle<Value> Connection::Get(const Arguments& args) {
   char* in_bucket = strdup(*(v8::String::AsciiValue::AsciiValue(args[0]->ToString())));
   char* in_key    = strdup(*(v8::String::AsciiValue::AsciiValue(args[1]->ToString())));
 
+
   riak_binary *bucket_bin   = riak_binary_copy_from_string(obj->cfg, in_bucket);
   riak_binary *key_bin      = riak_binary_copy_from_string(obj->cfg, in_key);
 
   riak_get_options *get_options = riak_get_options_new(obj->cfg);
-  riak_get_options_set_basic_quorum(get_options, RIAK_TRUE);
-  riak_get_options_set_r(get_options, 2);
 
   riak_get_response *get_response = NULL;
+  // TODO: riak_get() has a memory leak
   riak_error err = riak_get(obj->cxn, bucket_bin, key_bin, get_options, &get_response);
 
   riak_object* v = riak_get_get_content(get_response)[0];
-
   riak_binary *vv = riak_object_get_value(v);
   Local<String> vvv = v8::String::New((char*)riak_binary_data(vv), riak_binary_len(vv));
 
   riak_binary *vc = riak_get_get_vclock(get_response);
   Local<String> vcc = v8::String::New((char*)riak_binary_data(vc), riak_binary_len(vc));
 
-  riak_get_options_free(obj->cfg, &get_options);
   riak_get_response_free(obj->cfg, &get_response);
-  riak_free(obj->cfg, &bucket_bin);
-  riak_free(obj->cfg, &key_bin);
+  riak_get_options_free(obj->cfg, &get_options);
   free(in_bucket);
   free(in_key);
+  riak_binary_free(obj->cfg, &bucket_bin);
+  riak_binary_free(obj->cfg, &key_bin);
 
   Local<Object> result_obj = Object::New();
   result_obj->Set(String::NewSymbol("riak_bucket"), args[0]->ToString());
-  result_obj->Set(String::NewSymbol("riak_key"), args[1]->ToString());
+  result_obj->Set(String::NewSymbol("riak_key"),    args[1]->ToString());
   result_obj->Set(String::NewSymbol("riak_value"), vvv);
-  //result_obj->Set(String::NewSymbol("riak_vclock"), vcc);
 
   return scope.Close(result_obj);
 }
