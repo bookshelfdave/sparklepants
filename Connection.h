@@ -13,7 +13,7 @@ class Connection : public node::ObjectWrap {
   ~Connection();
 
   static v8::Handle<v8::Value> New(const v8::Arguments& args);
-  //static v8::Handle<v8::Value> PlusOne(const v8::Arguments& args);
+  static v8::Handle<v8::Value> Get(const v8::Arguments& args);
   static v8::Persistent<v8::Function> constructor;
 
   riak_config *cfg;
