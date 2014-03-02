@@ -1,4 +1,6 @@
+#ifndef BUILDING_NODE_EXTENSION
 #define BUILDING_NODE_EXTENSION
+#endif // BUILDING_NODE_EXTENSION
 #include <node/node.h>
 #include <iostream>
 #include "Connection.h"
@@ -8,7 +10,7 @@ using namespace v8;
 
 Persistent<Function> Connection::constructor;
 
-Connection::Connection(char *hostname, int32_t port) : hostname_(hostname), port_(port) {
+Connection::Connection(char *hostname, int32_t port) {
   // TODO: lookup stupid string copying stuff for C++
   std::cout << "Riak connection to " << hostname << ":" << port << std::endl;
   riak_error err = riak_config_new_default(&cfg);
@@ -54,11 +56,6 @@ Handle<Value> Connection::New(const Arguments& args) {
     return scope.Close(constructor->NewInstance(argc, argv));
   }
 }
-
-void debug(const char* msg) {
-  std::cout << "DEBUG:" << msg << std::endl;
-}
-
 
 Local<Object> makeGetResponse(Local<String> bucket, Local<String> key, riak_get_response *resp) {
   riak_int32_t objcount = riak_get_get_n_content(resp);

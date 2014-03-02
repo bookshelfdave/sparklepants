@@ -20,8 +20,8 @@ class Connection : public node::ObjectWrap {
 
   riak_config *cfg;
   riak_connection *cxn;
-  char* hostname_;
-  int32_t port_;
+  //char* hostname_;
+  //int32_t port_;
 };
 
 #endif
